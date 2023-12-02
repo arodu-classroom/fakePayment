@@ -12,6 +12,12 @@ const adminRouter = require('./routes/admin');
 
 const app = express();
 
+app.use(req, res, next) => {
+  res.append('Access-Control-Allow-Origin', ['*']);
+  res.append('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+  next();
+}
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
