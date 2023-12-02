@@ -1,3 +1,5 @@
+require('dotenv').config(); // Add this line to load environment variables from a .env file
+
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
@@ -5,7 +7,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
 const indexRouter = require('./routes/index');
-const paymentRouter = require('./routes/payment');
+const paymentsRouter = require('./routes/payments');
 
 const app = express();
 
@@ -20,7 +22,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/payment', paymentRouter);
+app.use('/payments', paymentsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

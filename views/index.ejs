@@ -1,11 +1,244 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>fakePayment API</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body>
+    <div id="app" class="container">
+        <header>
+            <div class="d-flex justify-content-between">
+                <h1 class="mt-4">fakePayment API</h1>
+                <div class="d-flex align-items-end mb-2">
+                    <a href="https://github.com/arodu/fakePayment" target="_blank" title="Fork me on github">
+                        <i class="fab fa-github fa-2x text-dark"></i>
+                    </a>
+                </div>
+            </div>
+        </header>
+        <hr>
+
+        <div class="row">
+            <p class="lead">Welcome to the fakePayment API documentation.</p>
+            <p>This API allows you to process payments in a secure and reliable manner.</p>
+        </div>
+
+        <div class="row">
+            <h2 class="mt-4">Getting Started</h2>
+            <p>To get started with the fakePayment API, you will need to sign up for an API key.</p>
+            <p>Once you have obtained your API key, you can start making requests to the API endpoints.</p>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <div class="input-group">
+                    <button @click="getApiKey()" class="btn btn-primary">Get new API key</button>
+                    <input type="text" ref="apiKey" class="flex-fill">
+                    <button class="btn btn-secondary" title="Copy to clipboard" @click="copyToClipboard()">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mt-4">API Endpoints</h2>
+                <p>The fakePayment API provides the following endpoints:</p>
+            </div>
+
+            <div class="col-12">
+                <ul>
+                    <li><code>/payments</code> - Create a new payment
+                        <div>
+                            <p>
+                                The "/payments" endpoint is used to create a new payment. To send the necessary
+                                information, you need to make an HTTP request to this endpoint with the payment data in
+                                the request body.
+                            </p>
+                            <ul>
+                                <li><code>"amount"</code>: The payment amount</li>
+                                <li><code>"card-number"</code>: The credit card number used for the payment</li>
+                                <li><code>"cvv"</code>: The credit card security code</li>
+                                <li><code>"expiration-month"</code>: The expiration month of the credit card</li>
+                                <li><code>"expiration-year"</code>: The expiration year of the credit card</li>
+                                <li><code>"full-name"</code>: The full name of the credit card holder, or error codes
+                                    (APPROVED, REJECTED, ERROR, INSUFFICIENT)</li>
+                                <li><code>"currency"</code>: The currency used for the payment (USD, EUR, VES)</li>
+                                <li><code>"description"</code>: A description of the payment</li>
+                                <li><code>"reference"</code>: Any extra information that you want to associate with the
+                                    payment</li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row">
+            <h2 class="mt-4">Authentication</h2>
+            <p>All API requests must include an API key in the request headers.</p>
+            <p>To authenticate your requests, include the following header:</p>
+            <pre><code>Authorization: Bearer YOUR_API_KEY</code></pre>
+        </div>
+
+        <div class="row">
+            <h2 class="mt-4">Test Data</h2>
+            <p>To perform tests, you can use the following data:</p>
+
+            <table class="table mb-3">
+                <tr>
+                    <th>Type</th>
+                    <th>Card Number</th>
+                </tr>
+                <% cards.forEach(function(card) { %>
+                    <tr>
+                        <td>
+                            <%= card.cardType %>
+                        </td>
+                        <td>
+                            <%= card.cardNumber %>
+                        </td>
+                    </tr>
+                    <% }); %>
+            </table>
+            <p>If you don't use any of these cards, an Invalid card number error (001) will be thrown.</p>
+
+            <table class="table mb-3">
+                <tr>
+                    <th>full-name</th>
+                    <th>description</th>
+                    <th>error code</th>
+                </tr>
+                <tr>
+                    <td>APPROVED</td>
+                    <td>or any name, payment approved</td>
+                    <td>N/A</td>
+                </tr>
+                <tr>
+                    <td>REJECTED</td>
+                    <td>payment rejected</td>
+                    <td>002</td>
+                </tr>
+                <tr>
+                    <td>ERROR</td>
+                    <td>payment error</td>
+                    <td>003</td>
+                </tr>
+                <tr>
+                    <td>INSUFFICIENT</td>
+                    <td>insufficient funds</td>
+                    <td>004</td>
+                </tr>
+            </table>
+
+        </div>
+
+        <div class="row">
+            <h2 class="mt-4">Testing</h2>
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <textarea class="form-control" ref="requestExample" style="min-height: 400px;"></textarea>
+                    <button @click="submitTest()" class="btn btn-primary mt-2">Send request</button>
+                </div>
+                <div class="col-lg-6 response-code p-2 rounded mt-5 mt-lg-0">{{ responseExample }}</div>
+            </div>
+        </div>
+
+        <footer>
+            <hr>
+            <p class="text-center">fakePayment API © 2023 </p>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script>
+        const { ref, createApp } = Vue;
+
+        const example = {
+            "amount": "1000",
+            "card-number": "4111111111111111",
+            "cvv": "123",
+            "expiration-month": "01",
+            "expiration-year": "2024",
+            "full-name": "APROVED",
+            "currency": "USD",
+            "description": "cool stuff",
+            "reference": "payment_id:46"
+        };
+
+        createApp({
+            setup() {
+                const apiKey = ref(null);
+                const responseExample = ref("// send a new request");
+                let requestExample;
+
+                return {
+                    apiKey,
+                    responseExample,
+                    requestExample,
+                }
+            },
+            mounted() {
+                this.getApiKey()
+                this.requestExample.value = JSON.stringify(example, null, 4)
+            },
+            methods: {
+                getApiKey() {
+                    fetch('/payments/api-key')
+                        .then(response => response.json())
+                        .then(data => {
+                            this.apiKey.value = data.apiKey;
+                        });
+                    //this.apiKey.value = Math.random().toString(36).substring(2);
+                },
+                submitTest() {
+                    const value = this.requestExample.value;
+
+                    fetch('/payments',
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${this.apiKey.value}`
+                            },
+                            body: value,
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            this.responseExample = JSON.stringify(data, null, 4);
+                        });
+                },
+                copyToClipboard() {
+                    const el = this.$refs.apiKey;
+                    el.select();
+                    document.execCommand("copy");
+
+                    alert('copied to clipboard')
+                }
+            },
+        }).mount('#app')
+    </script>
+
+    <style>
+        .response-code {
+            font-family: monospace;
+            white-space: pre;
+            overflow: auto;
+            background: #333;
+            color: #fff;
+        }
+    </style>
+
+</body>
+
 </html>
