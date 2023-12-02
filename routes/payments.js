@@ -4,6 +4,7 @@ const { body, validationResult } = require('express-validator');
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const cards = require('../config/cards');
+const database = require('../config/database');
 
 // Middleware for Bearer authorization
 const authenticateToken = (req, res, next) => {
@@ -29,18 +30,14 @@ router.post('/',
     body('amount').notEmpty(),
     body('currency').isLength({ min: 3, max: 3 }),
     body('description').notEmpty(),
-    function (req, res) {
+    async function (req, res) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
 
-        console.log(errors)
-
         const card_number = req.body['card-number'];
         const full_name = req.body['full-name'];
-        let response;
-        let success = false;
 
         if (!cards.cardExists(card_number)) {
             return res.status(400).json({
@@ -74,22 +71,19 @@ router.post('/',
             });
         }
 
-        return res.status(200).json({
-            success: true,
-            message: 'Payment successful',
-            data: {
-                transaction_id: uuidv4(),
-                amount: req.body['amount'],
-                currency: req.body['currency'],
-                description: req.body['description'],
-                reference: req.body['reference'] ?? null,
-                date: new Date().toISOString(),
-            },
-            
-        });
+        const data = {
+            transaction_id: uuidv4(),
+            amount: req.body['amount'],
+            currency: req.body['currency'],
+            description: req.body['description'],
+            reference: req.body['reference'] ?? null,
+            date: new Date().toISOString(),
+        }
 
+        await database.insert(data);
+
+        return res.redirect('/payments/' + data.transaction_id);
     });
-
 
 router.get('/cards', function (req, res) {
     res.json(cards.getList());
@@ -103,6 +97,25 @@ router.get('/api-key', function (req, res) {
 
     const apiKey = jwt.sign(payload, process.env.JWT_KEY);
     res.json({ apiKey });
+});
+
+router.get('/:id', async function (req, res) {
+    const id = req.params.id;
+    const transaction = await database.select(id);
+
+    if (!transaction) {
+        return res.status(404).json({
+            success: false,
+            message: 'Transaction not found',
+            code: '005',
+        });
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: 'Payment successful',
+        data: transaction,
+    });
 });
 
 module.exports = router;
