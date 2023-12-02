@@ -97,6 +97,7 @@
                 <tr>
                     <th>Type</th>
                     <th>Card Number</th>
+                    <th></th>
                 </tr>
                 <% cards.forEach(function(card) { %>
                     <tr>
@@ -106,6 +107,7 @@
                         <td>
                             <%= card.cardNumber %>
                         </td>
+                        <td><button class="btn btn-secondary btn-sm" @click="testWith('card-number', '<%= card.cardNumber %>')">Test</button></td>
                     </tr>
                     <% }); %>
             </table>
@@ -116,26 +118,31 @@
                     <th>full-name</th>
                     <th>description</th>
                     <th>error code</th>
+                    <th></th>
                 </tr>
                 <tr>
                     <td>APPROVED</td>
                     <td>or any name, payment approved</td>
                     <td>N/A</td>
+                    <td><button class="btn btn-secondary btn-sm" @click="testWith('full-name', 'APPROVED')">Test</button></td>
                 </tr>
                 <tr>
                     <td>REJECTED</td>
                     <td>payment rejected</td>
                     <td>002</td>
+                    <td><button class="btn btn-secondary btn-sm" @click="testWith('full-name', 'REJECTED')">Test</button></td>
                 </tr>
                 <tr>
                     <td>ERROR</td>
                     <td>payment error</td>
                     <td>003</td>
+                    <td><button class="btn btn-secondary btn-sm" @click="testWith('full-name', 'ERROR')">Test</button></td>
                 </tr>
                 <tr>
                     <td>INSUFFICIENT</td>
                     <td>insufficient funds</td>
                     <td>004</td>
+                    <td><button class="btn btn-secondary btn-sm" @click="testWith('full-name', 'INSUFFICIENT')">Test</button></td>
                 </tr>
             </table>
 
@@ -147,7 +154,9 @@
             <div class="row">
                 <div class="col-lg-6">
                     <textarea class="form-control" ref="requestExample" style="min-height: 400px;"></textarea>
-                    <button @click="submitTest()" class="btn btn-primary mt-2">Send request</button>
+                    <button @click="submitTest()" class="btn btn-primary mt-2">
+                        Send request
+                    </button>
                 </div>
                 <div class="col-lg-6 response-code p-2 rounded mt-5 mt-lg-0">{{ responseExample }}</div>
             </div>
@@ -202,7 +211,6 @@
                 },
                 submitTest() {
                     const value = this.requestExample.value;
-
                     fetch('/payments',
                         {
                             method: 'POST',
@@ -224,6 +232,11 @@
                     document.execCommand("copy");
 
                     alert('copied to clipboard')
+                },
+                testWith(key, value) {
+                    const example = JSON.parse(this.requestExample.value);
+                    example[key] = value;
+                    this.requestExample.value = JSON.stringify(example, null, 4);
                 }
             },
         }).mount('#app')
