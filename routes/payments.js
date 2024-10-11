@@ -91,7 +91,7 @@ router.get('/cards', function (req, res) {
 
 router.get('/api-key', function (req, res) {
     const payload = {
-        name: 'John Doe',
+        name: 'fake payment',
         date: new Date().toISOString(),
     };
 
